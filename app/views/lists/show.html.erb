@@ -1,6 +1,8 @@
 <%= link_to "return home", root_path %>
 <h1>Show page for <%= @list.name %></h1>
 <%= link_to "bookmark a new movie", new_list_bookmark_path(@list) %>
+<%= link_to "Delete list", list_path(@list), data: {turbo_method: :delete, turbo_confirm: "Are you sure you want to delete this event?"} %>
+
 
 <div class="row my-2">
   <% @list.movies.each do |movie| %>
