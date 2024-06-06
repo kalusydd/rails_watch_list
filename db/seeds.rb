@@ -45,70 +45,54 @@
 #     )
 #   end
 # end
-require "open-uri"
-require "json"
+
+require 'open-uri'
+require 'json'
 require 'net/http'
 
 tmdb_apikey = ENV['TMDB_API']
 tmdb_accesstoken = ENV['TMDB_ACESSTOKEN']
 
-puts "Cleaning up database..."
-puts "🍿 Destroying movies..."
+puts 'Cleaning up database...'
+
+puts 'Destroying users...'
+User.destroy_all
+puts 'Users destroyed'
+
+puts '🍿 Destroying movies...'
 Movie.destroy_all
-puts "Movies destroyed 🎬"
-puts "Database cleaned"
+puts 'Movies destroyed 🎬'
+puts 'Database cleaned'
 
-# # Define the url
-# url = URI("https://api.themoviedb.org/3/discover/movie?api_key==#{tmdb_apikey}&page=1")
-# # Create HTTP object with SSL enabled
-# http = Net::HTTP.new(url.host, url.port)
-# http.use_ssl = true
-# # Create the GET request
-# request = Net::HTTP::Get.new(url)
-# request["accept"] = 'application/json'
-# # Set authorization header with access token
-# access_token = tmdb_accesstoken
-# request["Authorization"] = "Bearer #{access_token}"
-# # Send request and receive the response
-# response = http.request(request)
-# # Parse the JSON response
-# movies_data = JSON.parse(response.body)
-# puts "📽 Creating movies..."
-# # Iterate over data and create movies
-# movies_data["results"].each do |movie|
-#   puts movie["title"]
-# end
+user_kat = User.new(email: "kat@gmail.com", password: "123456", username: "KittyO", first_name: "Kat")
+user_kat.save!
 
-url = URI("https://api.themoviedb.org/3/movie/top_rated?api_key=#{tmdb_apikey}&page=1")
-http = Net::HTTP.new(url.host, url.port)
-http.use_ssl = true
-
-request = Net::HTTP::Get.new(url)
-request["accept"] = 'application/json'
-access_token = tmdb_accesstoken
-request["Authorization"] = "Bearer #{access_token}"
-
-response = http.request(request)
-movies_data = JSON.parse(response.body)
-total_pages = movies_data["total_pages"]
 movie_count = 0
 
-puts "📽 Creating movies..."
+puts '📽 Creating movies...'
 # Iterate over all pages of results
-(1..total_pages).each do |page|
+(1..10).each do |page|
   url = URI("https://api.themoviedb.org/3/movie/top_rated?api_key=#{tmdb_apikey}&page=#{page}")
+  # Iterate over movies on the current page
+  http = Net::HTTP.new(url.host, url.port)
+  http.use_ssl = true
+  # Create the GET request
   request = Net::HTTP::Get.new(url)
-  request["accept"] = 'application/json'
-  request["Authorization"] = "Bearer #{access_token}"
+  request['accept'] = 'application/json'
+  # Set authorization header with access token
+  request['Authorization'] = "Bearer #{tmdb_accesstoken}"
+  # Send request and receive the response
   response = http.request(request)
   movies_data = JSON.parse(response.body)
-
-  # Iterate over movies on the current page
-  movies_data["results"].each do |movie|
-    puts movie["title"]
+  movies_data['results'].each do |movie|
+    Movie.create(
+      title: movie['title'],
+      overview: movie['overview'],
+      poster_url: "https://image.tmdb.org/t/p/original/#{movie['poster_path']}",
+      year: movie['release_date'].slice(0, 4),
+      rating: movie['vote_average']
+    )
     movie_count += 1
-    # Create or save the movie record in your Rails app here
-    # ...
   end
 end
 
