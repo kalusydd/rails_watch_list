@@ -54,6 +54,7 @@ tmdb_apikey = ENV['TMDB_API']
 tmdb_accesstoken = ENV['TMDB_ACESSTOKEN']
 
 puts 'Cleaning up database...'
+List.destroy_all
 
 puts 'Destroying users...'
 User.destroy_all
