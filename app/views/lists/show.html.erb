@@ -1,26 +1,35 @@
-<%= link_to "return home", root_path %>
-<h1>Show page for <%= @list.name %></h1>
-<%= link_to "bookmark a new movie", new_list_bookmark_path(@list) %>
-<%= link_to "Delete list", list_path(@list), data: {turbo_method: :delete, turbo_confirm: "Are you sure you want to delete this event?"} %>
+<div class="banner" style="background-image: linear-gradient(rgba(0,0,0,0.4),rgba(0,0,0,0.4)), url('<%= cl_image_path @list.photo.key, height: 300, crop: :fill %>');">
+  <div class="container">
+    <%= link_to root_path  do %>
+      <i class="fa-solid fa-house" style="color: #ffffff;"></i>
+    <% end %>
+    <h1><%= @list.name %></h1>
+  </div>
+</div>
 
-
-<div class="row my-2">
-  <% @list.movies.each do |movie| %>
-    <% bookmark = Bookmark.find_by(list: @list, movie: movie) %>
-    <div class="col-12 col-sm-6 mb-4" data-aos="zoom-in">
-      <div class="bg-white rounded shadow h-100">
-        <%= image_tag movie.poster_url, alt: movie.title, class: "movie-img rounded-top" %>
-        <div class="p-3 rounded-bottom d-flex flex-column">
-          <strong><%= movie.title %> <span class="text-muted font-weight-normal">• <%= movie.rating %> <i class="fas fa-star star-yellow"></i></span></strong>
-          <small class="text-muted"><%= movie.overview %></small>
-          <div class="d-flex align-items-end justify-content-between pt-4">
-            <div>
-              <i class="fas fa-quote-left me-2"></i><small class="flex-grow-1"><%= bookmark.comment %></small>
+<div class="container">
+  <div class="show-buttons">
+    <%= link_to "bookmark a new movie", new_list_bookmark_path(@list), class: "btn btn-success" %>
+    <%= link_to "Delete list", list_path(@list), data: {turbo_method: :delete, turbo_confirm: "Are you sure you want to delete this event?"}, class: "btn btn-danger" %>
+  </div>
+  <div class="row my-2">
+    <% @list.movies.each do |movie| %>
+      <% bookmark = Bookmark.find_by(list: @list, movie: movie) %>
+      <div class="col-12 col-sm-6 mb-4" data-aos="zoom-in">
+        <div class="bg-white rounded shadow h-100">
+          <%= image_tag movie.poster_url, alt: movie.title, class: "movie-img rounded-top" %>
+          <div class="p-3 rounded-bottom d-flex flex-column">
+            <strong><%= movie.title %> <span class="text-muted font-weight-normal">• <%= movie.rating %> <i class="fas fa-star star-yellow"></i></span></strong>
+            <small class="text-muted"><%= movie.overview %></small>
+            <div class="d-flex align-items-end justify-content-between pt-4">
+              <div>
+                <i class="fas fa-quote-left me-2"></i><small class="flex-grow-1"><%= bookmark.comment %></small>
+              </div>
+              <small class="text-right flex-shrink-0"><%= link_to "delete", bookmark_path(bookmark), data: { turbo_method: :delete, turbo_confirm: "Are you sure you want to remove #{movie.title} from your #{@list.name} list"}, class: 'text-danger' %></small>
             </div>
-            <small class="text-right flex-shrink-0"><%= link_to "delete", bookmark_path(bookmark), data: { turbo_method: :delete, turbo_confirm: "Are you sure you want to remove #{movie.title} from your #{@list.name} list"}, class: 'text-danger' %></small>
           </div>
         </div>
       </div>
-    </div>
-  <% end %>
+    <% end %>
+  </div>
 </div>
